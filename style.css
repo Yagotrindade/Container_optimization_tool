@@ -1,0 +1,455 @@
+:root {
+    --bg-main: #0f172a;
+    --bg-side: #1e293b;
+    --accent: #38bdf8;
+    --text-main: #f1f5f9;
+    --text-dim: #94a3b8;
+    --border: #334155;
+    --z0-color: #f59e0b;
+    --z1-color: #0ea5e9;
+    --red: #ef4444;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-main);
+    color: var(--text-main);
+    margin: 0;
+}
+
+.main-layout {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100% !important;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+.sidebar {
+    width: 340px;
+    background: var(--bg-side);
+    padding: 24px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+h2 {
+    margin: 0;
+}
+
+h2 span {
+    color: var(--accent);
+}
+
+h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin: 0 0 10px 0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.full-width {
+    grid-column: span 3;
+}
+
+.field label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+}
+
+input,
+select {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.checkbox-container {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #0f172a;
+    width: 100%;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    width: 100%;
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--red);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    margin-top: auto;
+}
+
+.view-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sub {
+    background: #334155;
+    color: white;
+    flex: 1;
+    font-size: 11px;
+}
+
+.weight-card {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+}
+
+.progress-bar {
+    height: 6px;
+    background: #334155;
+    border-radius: 3px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+#progressFill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: 0.5s;
+}
+
+.result-card {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.viewport {
+    flex-grow: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    overflow: auto;
+}
+
+.config-top {
+    margin-bottom: -20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+
+
+#container-floor {
+    background: #1e293b;
+    border: 2px solid var(--accent);
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.palete { 
+    position: absolute; 
+    border-radius: 4px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 10px; 
+    font-weight: bold; 
+    color: white; 
+    cursor: grab; 
+    transition: transform 0.3s ease; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+    
+    /* Adições críticas para Touchscreen */
+    touch-action: none; 
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.palete.tilted {
+    border: 2px solid #fbbf24;
+}
+
+.palete.empilhavel::after {
+    content: '◈';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    opacity: 0.5;
+}
+
+#cg-indicator-point {
+    width: 28px;
+    height: 28px;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.7) 0%, transparent 70%);
+    border: 2px solid white;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: none;
+    pointer-events: none;
+    z-index: 100;
+}
+
+#feedback-msg {
+    position: fixed;
+    background: var(--red);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    display: none;
+    z-index: 9999;
+}
+
+.side-view-section {
+    width: 100%;
+    overflow-x: auto;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+#side-view-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    position: relative;
+    margin: 20px auto;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+.side-palete-block {
+    position: absolute;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-sizing: border-box;
+    transition: transform 0.3s;
+}
+
+.y-axis {
+    position: absolute;
+    left: -50px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-dim);
+}
+
+/* Modal & Tooltip */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 5000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+/* Aumentei o max-width para 850px para caber os novos inputs */
+.modal-content {
+    background: var(--bg-side);
+    margin: 5% auto;
+    padding: 25px;
+    border: 1px solid var(--border);
+    width: 95%;
+    max-width: 850px;
+    border-radius: 12px;
+}
+
+.modal-content header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.close {
+    color: var(--text-dim);
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.itens-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding-right: 5px;
+}
+
+/* Novo grid para acomodar as medidas e peso */
+.item-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2.5fr 0.8fr 1fr 1fr 1fr 1fr 40px;
+    gap: 8px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.item-row input {
+    padding: 8px 6px;
+    font-size: 12px;
+}
+
+.tooltip-popup {
+    position: fixed;
+    display: none;
+    background: #1e293b;
+    border: 1px solid var(--accent);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    z-index: 6000;
+    pointer-events: none;
+    font-size: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    min-width: 250px;
+}
+
+.print-only {
+    display: none;
+}
+
+/* Configuração do PDF */
+@media print {
+
+    .sidebar,
+    .modal,
+    .btn-delete,
+    .top-select,
+    .config-top,
+    #feedback-msg,
+    .view-controls {
+        display: none !important;
+    }
+
+    body,
+    .main-layout,
+    .viewport {
+        background: white !important;
+        color: black !important;
+        display: block !important;
+        width: 100%;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    #container-floor,
+    #side-view-container {
+        border: 2px solid #333 !important;
+        background: #f8f9fa !important;
+        page-break-inside: avoid;
+        margin: 20px auto !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    #side-view-container {
+        height: 150px !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+
+    .palete,
+    .side-palete-block {
+        border: 1px solid black !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        font-size: 11px;
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background: #eee !important;
+        print-color-adjust: exact;
+    }
+
+    .result-card {
+        display: block !important;
+        background: #fff !important;
+        border: 1px solid #000 !important;
+        margin-top: 20px;
+        padding: 10px;
+    }
+}

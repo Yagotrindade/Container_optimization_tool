@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogSim Pro | Simulador de Carga</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-layout">
+       <aside class="sidebar">
+            <header><h2>LogiSim <span>Pro</span></h2></header>
+            
+            <section class="form-section">
+                <h3>Novo Palete</h3>
+                
+                <div class="field full-width" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label style="margin:0;">Unidade de Medida:</label>
+                    <select id="unidadeMedida" onchange="atualizarLabelsMedida()" style="width: auto; padding: 4px 8px;">
+                        <option value="m">Metros (m)</option>
+                        <option value="cm">Centímetros (cm)</option>
+                        <option value="mm">Milímetros (mm)</option>
+                    </select>
+                </div>
+
+                <div class="form-grid">
+                    <input type="text" id="pNome" placeholder="ID da Carga" class="full-width">
+                    <div class="field"><label id="lblComp">C (m)</label><input type="number" id="pComprimento" value="1.2" step="0.05"></div>
+                    <div class="field"><label id="lblLarg">L (m)</label><input type="number" id="pLargura" value="1.0" step="0.05"></div>
+                    <div class="field"><label id="lblAlt">A (m)</label><input type="number" id="pAltura" value="1.1" step="0.05"></div>
+                    <div class="field full-width"><label>Peso (kg)</label><input type="number" id="pPeso" value="500"></div>
+                </div>
+                
+                <button class="btn-sub" type="button" onclick="setTamanhoPadrao()" style="width: 100%; margin: 10px 0;">📐 Resetar Padrão PBR</button>
+
+                <div class="field full-width">
+                    <label>Nível de Alocação</label>
+                    <select id="pNivelDesejado">
+                        <option value="0">Chão (Z:0)</option>
+                        <option value="1">Superior (Z:1)</option>
+                    </select>
+                </div>
+                <label class="checkbox-container" style="margin: 10px 0;">
+                    <input type="checkbox" id="pEmpilhavel" checked> Permite empilhar itens acima
+                </label>
+                <button class="btn-primary" onclick="adicionarNovoPalete()">Adicionar ao Plano</button>
+            </section>
+
+            <section class="status-section">
+                <div class="weight-card">
+                    <span>Carga no Container</span>
+                    <h4 id="pesoDisplay">0 / 28000 kg</h4>
+                    <div class="progress-bar"><div id="progressFill"></div></div>
+                </div>
+                <div class="view-controls" style="margin-top:10px;">
+                    <button onclick="filtrarNivel(0)" class="btn-sub">Ver Z:0</button>
+                    <button onclick="filtrarNivel(1)" class="btn-sub">Ver Z:1</button>
+                </div>
+                <div id="resultados" class="result-card" style="display: none;">
+                    <strong>Análise de Estabilidade:</strong>
+                    <p id="resPesoTotal"></p>
+                    <p id="resDeslocamento"></p>
+                    <p id="resSugestao" style="font-style: italic; color: #fbbf24;"></p>
+                </div>
+            </section>
+
+            <section class="config-section" style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);">
+                <h3>Gerenciamento de Projeto</h3>
+                <div class="view-controls">
+                    <button onclick="exportarLayout()" class="btn-sub">Salvar JSON</button>
+                    <label for="importarJSON" class="btn-sub" style="cursor:pointer; text-align:center; display:block; padding-top:10px;">Abrir JSON</label>
+                    <input type="file" id="importarJSON" style="display:none" onchange="importarLayout(event)">
+                </div>
+                <button class="btn-outline" onclick="window.print()" style="margin-top:10px; width:100%;">Gerar Relatório PDF</button>
+                <button class="btn-danger" onclick="limparTudoComConfirmacao()" style="margin-top:10px; width:100%;">Limpar Tudo</button>
+            </section>
+        </aside>
+
+        <main class="viewport">
+            <div class="config-top">
+                <select id="tipoContainer" onchange="mudarContainer()">
+                    <option value="20">20 Pés (5.9m x 2.35m)</option>
+                    <option value="40">40 Pés (12.0m x 2.35m)</option>
+                </select>
+            </div>
+
+            <div class="print-only header-pdf">
+                <h1>Relatório de Ovação e Estabilidade</h1>
+                <p>Data de emissão: <span id="print-date"></span></p>
+                <hr>
+            </div>
+
+            <div id="container-floor">
+                <div id="cg-indicator-point"></div>
+                <div id="feedback-msg">ESPAÇO INDISPONÍVEL</div>
+            </div>
+
+            <div class="side-view-section">
+                <h3>Vista Lateral de Altura (Auto-Tilt Físico)</h3>
+                <div id="side-view-container">
+                    <div class="y-axis"><span>2.39m</span><span>1.2m</span><span>0m</span></div>
+                </div>
+            </div>
+
+            <div class="print-only table-pdf">
+                <h3>Detalhamento Analítico</h3>
+                <table id="lista-paletes-print">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Sub-Itens (Conteúdo)</th>
+                            <th>Nível</th>
+                            <th>Peso (kg)</th>
+                            <th>Dim. (C x L x A)</th>
+                            <th>Posição Central (X, Y)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="tooltip-info" class="tooltip-popup"></div>
+
+    <div id="modalDetalhes" class="modal">
+        <div class="modal-content">
+            <header>
+                <h2 id="modalTitle">Detalhes do Palete</h2>
+                <span class="close" onclick="fecharModal()">&times;</span>
+            </header>
+            <div id="listaItensInternos" class="itens-container">
+                </div>
+            <footer>
+                <button class="btn-sub" onclick="adicionarLinhaItem()">+ Adicionar Item</button>
+                <button class="btn-primary" onclick="salvarDetalhesPalete()">Salvar Alterações</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
