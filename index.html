@@ -2,18 +2,26 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LogSim Pro | Simulador de Carga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LogiSim Pro | Simulador de Carga</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="main-layout">
-       <aside class="sidebar">
-            <header><h2>LogiSim <span>Pro</span></h2></header>
+        <div class="mobile-header print-only-hide">
+            <h2 onclick="abrirTutorial()" style="cursor:pointer;">LogiSim <span>Pro</span></h2>
+            <button class="hamburger-btn" onclick="toggleSidebar()">&#9776;</button>
+        </div>
+        <div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <aside class="sidebar" id="app-sidebar">
+            <header class="sidebar-header">
+                <h2 onclick="abrirTutorial()" style="cursor:pointer;" title="Ver Tutorial">LogiSim <span>Pro</span></h2>
+                <button class="close-sidebar-btn" onclick="toggleSidebar()">&times;</button>
+            </header>
             
             <section class="form-section">
                 <h3>Novo Palete</h3>
-                
                 <div class="field full-width" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <label style="margin:0;">Unidade de Medida:</label>
                     <select id="unidadeMedida" onchange="atualizarLabelsMedida()" style="width: auto; padding: 4px 8px;">
@@ -22,7 +30,6 @@
                         <option value="mm">Milímetros (mm)</option>
                     </select>
                 </div>
-
                 <div class="form-grid">
                     <input type="text" id="pNome" placeholder="ID da Carga" class="full-width">
                     <div class="field"><label id="lblComp">C (m)</label><input type="number" id="pComprimento" value="1.2" step="0.05"></div>
@@ -30,9 +37,7 @@
                     <div class="field"><label id="lblAlt">A (m)</label><input type="number" id="pAltura" value="1.1" step="0.05"></div>
                     <div class="field full-width"><label>Peso (kg)</label><input type="number" id="pPeso" value="500"></div>
                 </div>
-                
                 <button class="btn-sub" type="button" onclick="setTamanhoPadrao()" style="width: 100%; margin: 10px 0;">📐 Resetar Padrão PBR</button>
-
                 <div class="field full-width">
                     <label>Nível de Alocação</label>
                     <select id="pNivelDesejado">
@@ -65,7 +70,7 @@
             </section>
 
             <section class="config-section" style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border);">
-                <h3>Gerenciamento de Projeto</h3>
+                <h3>Gerenciamento</h3>
                 <div class="view-controls">
                     <button onclick="exportarLayout()" class="btn-sub">Salvar JSON</button>
                     <label for="importarJSON" class="btn-sub" style="cursor:pointer; text-align:center; display:block; padding-top:10px;">Abrir JSON</label>
@@ -107,12 +112,12 @@
                 <table id="lista-paletes-print">
                     <thead>
                         <tr>
-                            <th>Item</th>
-                            <th>Sub-Itens (Conteúdo)</th>
+                            <th>Item Principal</th>
+                            <th>Sub-Itens (Micro-localização)</th>
                             <th>Nível</th>
                             <th>Peso (kg)</th>
                             <th>Dim. (C x L x A)</th>
-                            <th>Posição Central (X, Y)</th>
+                            <th>Posição Container (X, Y)</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -123,17 +128,94 @@
 
     <div id="tooltip-info" class="tooltip-popup"></div>
 
-    <div id="modalDetalhes" class="modal">
-        <div class="modal-content">
+    <div id="modalTutorial" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
             <header>
-                <h2 id="modalTitle">Detalhes do Palete</h2>
+                <h2>Bem-vindo ao LogiSim <span>Pro</span>!</h2>
+                <span class="close" onclick="fecharTutorial()">&times;</span>
+            </header>
+            <div style="line-height: 1.6; color: var(--text-main);">
+                <p>Para otimizar o carregamento do seu container, siga estes passos rápidos:</p>
+                <ul style="padding-left: 20px; color: var(--text-dim);">
+                    <li><b>1. Adicione Cargas:</b> Preencha as medidas no menu lateral.</li>
+                    <li><b>2. Arraste e Solte:</b> Mova as cargas livremente na vista aérea.</li>
+                    <li><b>3. Construa Paletes:</b> Dê um <b>Duplo Clique</b> em qualquer carga para abrir o construtor visual aninhado e detalhar a carga interna.</li>
+                </ul>
+            </div>
+            <footer style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <label class="checkbox-container" style="color: var(--text-dim);"><input type="checkbox" id="chkNaoMostrarNovamente"> Não mostrar novamente</label>
+                <button class="btn-primary" style="width: auto; padding: 10px 20px;" onclick="fecharTutorial()">Entendi!</button>
+            </footer>
+        </div>
+    </div>
+
+    <div id="modalDetalhes" class="modal">
+        <div class="modal-content" style="max-width: 1100px; width: 95%;">
+            <header>
+                <h2 id="modalTitle">Construtor de Palete</h2>
                 <span class="close" onclick="fecharModal()">&times;</span>
             </header>
-            <div id="listaItensInternos" class="itens-container">
+            
+            <div class="modal-split" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                
+                <div class="modal-left" style="flex: 1; min-width: 320px;">
+                    <div class="edit-pallet-section" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border);">
+                        <h3 style="margin-top:0; color:var(--accent);">Limites do Palete</h3>
+                        <div class="form-grid" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+                            <div class="field"><label>ID</label><input type="text" id="editPalletNome"></div>
+                            <div class="field"><label>Total Kg</label><input type="number" id="editPalletPeso" step="1"></div>
+                            <div class="field"><label>C Max(m)</label><input type="number" id="editPalletComp" step="0.01" onchange="atualizarAreaPalete()"></div>
+                            <div class="field"><label>L Max(m)</label><input type="number" id="editPalletLarg" step="0.01" onchange="atualizarAreaPalete()"></div>
+                            <div class="field"><label>A Max(m)</label><input type="number" id="editPalletAlt" step="0.01" onchange="atualizarAreaPalete()"></div>
+                        </div>
+                    </div>
+
+                    <div class="edit-pallet-section" style="background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--accent);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="margin:0; color:var(--text-main);">Adicionar Item Interno</h3>
+                            <select id="unidadeMedidaPalete" onchange="atualizarLabelsMedidaPalete()" style="width: auto; padding: 4px 8px; font-size: 11px;">
+                                <option value="m">Metros (m)</option>
+                                <option value="cm">Centímetros (cm)</option>
+                                <option value="mm">Milímetros (mm)</option>
+                            </select>
+                        </div>
+                        <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="field" style="grid-column: span 2;"><label>ID do Item</label><input type="text" id="addCaixaId"></div>
+                            <div class="field" style="grid-column: span 2;"><label>Descrição</label><input type="text" id="addCaixaDesc"></div>
+                            <div class="field"><label id="lblCaixaC">C (m)</label><input type="number" id="addCaixaC" value="0.4" step="0.05"></div>
+                            <div class="field"><label id="lblCaixaL">L (m)</label><input type="number" id="addCaixaL" value="0.3" step="0.05"></div>
+                            <div class="field"><label id="lblCaixaA">A (m)</label><input type="number" id="addCaixaA" value="0.3" step="0.05"></div>
+                            <div class="field"><label>Peso (kg)</label><input type="number" id="addCaixaP" value="10"></div>
+                            <div class="field"><label>Nível (Z)</label><input type="number" id="addCaixaZ" value="0" min="0" step="1"></div>
+                            <div class="field" style="grid-column: span 3; display: flex; align-items: flex-end;">
+                                <button class="btn-primary" onclick="adicionarCaixaNoPalete()" style="padding: 10px; width: 100%;">+ Alocar Item</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="color:var(--text-dim); margin-bottom: 5px;">Lista Rápida (Remoção)</h3>
+                    <div id="listaItensInternos" class="itens-container" style="max-height: 150px; background: rgba(0,0,0,0.1); border-radius: 6px; padding: 5px;"></div>
                 </div>
-            <footer>
-                <button class="btn-sub" onclick="adicionarLinhaItem()">+ Adicionar Item</button>
-                <button class="btn-primary" onclick="salvarDetalhesPalete()">Salvar Alterações</button>
+
+                <div class="modal-right" style="flex: 1.5; min-width: 400px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px dashed var(--border);">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin:0; color:var(--accent);">Visão Aérea do Palete</h3>
+                        <div class="field" style="display: flex; gap: 10px; align-items: center;">
+                            <label style="margin:0;">Interagir Nível Z:</label>
+                            <input type="number" id="viewNivelPalete" value="0" min="0" style="width: 60px; padding: 4px;" onchange="filtrarNivelPalete(this.value)">
+                        </div>
+                    </div>
+                    
+                    <div id="pallet-floor" style="background: #854d0e; border: 2px solid #ca8a04; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></div>
+                    <div id="feedback-pallet-msg" style="position: absolute; background: var(--red); color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold; display: none; z-index: 9999;">FORA DOS LIMITES</div>
+
+                    <h3 style="margin-top: 20px; color:var(--accent); width: 100%;">Vista Lateral de Empilhamento</h3>
+                    <div id="pallet-side-view" style="background: rgba(0,0,0,0.2); border: 1px solid var(--border); position: relative; margin-top: 10px; flex-shrink: 0; width: 100%;"></div>
+                </div>
+            </div>
+            
+            <footer style="margin-top:20px; display:flex; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 15px;">
+                <button class="btn-primary" style="width: auto; padding: 12px 30px;" onclick="salvarDetalhesPalete()">Salvar Palete e Voltar</button>
             </footer>
         </div>
     </div>

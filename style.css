@@ -23,16 +23,20 @@ body {
     min-height: 100vh;
 }
 
-@media (max-width: 1024px) {
-    .main-layout {
-        flex-direction: column;
-    }
+.mobile-header {
+    display: none;
+}
 
-    .sidebar {
-        width: 100% !important;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-    }
+#sidebar-overlay {
+    display: none;
+}
+
+.print-only-hide {
+    display: block;
+}
+
+.close-sidebar-btn {
+    display: none;
 }
 
 .sidebar {
@@ -47,11 +51,18 @@ body {
     box-sizing: border-box;
 }
 
-h2 {
+.sidebar-header {
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
     margin: 0;
 }
 
-h2 span {
+.sidebar-header h2 span {
     color: var(--accent);
 }
 
@@ -124,7 +135,6 @@ button {
     background: rgba(239, 68, 68, 0.1);
     color: var(--red);
     border: 1px solid rgba(239, 68, 68, 0.2);
-    margin-top: auto;
 }
 
 .view-controls {
@@ -187,8 +197,6 @@ button {
     max-width: 300px;
 }
 
-
-
 #container-floor {
     background: #1e293b;
     border: 2px solid var(--accent);
@@ -197,21 +205,19 @@ button {
     flex-shrink: 0;
 }
 
-.palete { 
-    position: absolute; 
-    border-radius: 4px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: 10px; 
-    font-weight: bold; 
-    color: white; 
-    cursor: grab; 
-    transition: transform 0.3s ease; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-    
-    /* Adições críticas para Touchscreen */
-    touch-action: none; 
+.palete {
+    position: absolute;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    cursor: grab;
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
 }
@@ -287,86 +293,101 @@ button {
 }
 
 /* Modal & Tooltip */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 5000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(4px);
-}
+/* ... [MANTENHA TODO O SEU CSS ATÉ A SEÇÃO DE MODAL & TOOLTIP] ... */
 
-/* Aumentei o max-width para 850px para caber os novos inputs */
-.modal-content {
-    background: var(--bg-side);
-    margin: 5% auto;
-    padding: 25px;
-    border: 1px solid var(--border);
-    width: 95%;
-    max-width: 850px;
-    border-radius: 12px;
-}
+/* Modal & Tooltip */
+.modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); }
+.modal-content { background: var(--bg-side); margin: 5% auto; padding: 25px; border: 1px solid var(--border); width: 95%; max-width: 950px; border-radius: 12px; }
+.modal-content header { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
+.close { color: var(--text-dim); font-size: 28px; cursor: pointer; }
 
-.modal-content header {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+/* Grid Atualizado para Caber Mapeamento X, Y, Z */
+.item-header, .item-row { 
+    display: grid; 
+    grid-template-columns: 1.2fr 2.5fr 0.6fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 35px; 
+    gap: 5px; align-items: center; 
 }
+.item-header { font-size: 10px; color: var(--text-dim); padding: 0 5px 5px 5px; font-weight: bold; text-align: center; border-bottom: 1px solid var(--border); margin-bottom: 10px;}
+.item-row { margin-bottom: 8px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; }
+.item-row input { padding: 6px 4px; font-size: 11px; text-align: center; background: var(--bg-main); border: 1px solid var(--border); color: white; border-radius: 4px; width:100%; box-sizing: border-box;}
 
-.close {
-    color: var(--text-dim);
-    font-size: 28px;
-    cursor: pointer;
+.itens-container { max-height: 350px; overflow-y: auto; padding-right: 5px; }
+
+.tooltip-popup { position: fixed; display: none; background: #1e293b; border: 1px solid var(--accent); color: white; padding: 12px; border-radius: 8px; z-index: 6000; pointer-events: none; font-size: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); min-width: 250px; }
+
+/* =========================================
+   COMPORTAMENTO PADRÃO (DESKTOP)
+   ========================================= */
+.mobile-header { display: none !important; } /* Força a ocultação no PC */
+#sidebar-overlay { display: none; }
+.close-sidebar-btn { display: none; } /* Esconde o "X" no PC */
+
+/* =========================================
+   RESPONSIVIDADE E MOBILE (< 1024px)
+   ========================================= */
+@media (max-width: 1024px) {
+    .main-layout { flex-direction: column; }
+    
+    /* Mostra o cabeçalho no topo exclusivamente no celular */
+    .mobile-header { 
+        display: flex !important; 
+        justify-content: space-between; 
+        align-items: center; 
+        background: var(--bg-side); 
+        padding: 15px 20px; 
+        border-bottom: 1px solid var(--border); 
+        width: 100%; 
+        box-sizing: border-box; 
+        z-index: 4000; 
+    }
+    
+    .mobile-header h2 { margin: 0; font-size: 1.4rem; }
+    
+    /* Estilização do botão hambúrguer como na sua imagem */
+    .hamburger-btn { 
+        background: var(--text-main); 
+        border: none; 
+        color: var(--bg-main); 
+        font-size: 20px; 
+        cursor: pointer; 
+        padding: 5px 12px; 
+        border-radius: 6px; 
+        font-weight: bold;
+    }
+    
+    .close-sidebar-btn { 
+        display: block; 
+        background: none; 
+        border: none; 
+        color: white; 
+        font-size: 32px; 
+        cursor: pointer; 
+        padding: 0; 
+        line-height: 1;
+    }
+    
+    /* Sidebar vira menu lateral sobreposto */
+    .sidebar { 
+        position: fixed; left: -100%; top: 0; width: 85% !important; max-width: 360px; 
+        height: 100vh !important; z-index: 5000; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        border-right: 1px solid var(--border); padding-bottom: 20px; 
+    }
+    .sidebar.open { left: 0; }
+    .sidebar-header { border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    
+    #sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 4500; display: none; backdrop-filter: blur(2px); }
+    #sidebar-overlay.active { display: block; }
+    
+    .viewport { padding: 20px 10px !important; margin-top: 0; height: calc(100vh - 70px); }
+    .config-top { max-width: 100%; margin-bottom: 0; }
 }
-
-.itens-container {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-    padding-right: 5px;
-}
-
-/* Novo grid para acomodar as medidas e peso */
-.item-row {
-    display: grid;
-    grid-template-columns: 1.5fr 2.5fr 0.8fr 1fr 1fr 1fr 1fr 40px;
-    gap: 8px;
-    margin-bottom: 10px;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.item-row input {
-    padding: 8px 6px;
-    font-size: 12px;
-}
-
-.tooltip-popup {
-    position: fixed;
-    display: none;
-    background: #1e293b;
-    border: 1px solid var(--accent);
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    z-index: 6000;
-    pointer-events: none;
-    font-size: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    min-width: 250px;
-}
-
+/* =========================================
+   IMPRESSÃO (PDF)
+   ========================================= */
 .print-only {
     display: none;
 }
 
-/* Configuração do PDF */
 @media print {
 
     .sidebar,
@@ -375,7 +396,10 @@ button {
     .top-select,
     .config-top,
     #feedback-msg,
-    .view-controls {
+    .view-controls,
+    .print-only-hide,
+    .mobile-header,
+    #sidebar-overlay {
         display: none !important;
     }
 
@@ -449,7 +473,24 @@ button {
         display: block !important;
         background: #fff !important;
         border: 1px solid #000 !important;
+        color: #000 !important;
         margin-top: 20px;
         padding: 10px;
     }
+}
+
+.caixa-interna {
+    position: absolute; border-radius: 2px; display: flex; align-items: center; justify-content: center; 
+    font-size: 9px; font-weight: bold; color: white; cursor: grab; transition: transform 0.2s ease;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3), 0 2px 5px rgba(0,0,0,0.4);
+    touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.caixa-interna.tilted { border: 1px solid #fbbf24; }
+
+.mini-item-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 4px; margin-bottom: 5px; font-size: 11px; }
+.mini-item-row button { background: none; border: none; color: var(--red); font-weight: bold; font-size: 16px; cursor: pointer; padding: 0;}
+
+@media (max-width: 768px) {
+    .modal-split { flex-direction: column; }
+    .modal-right { min-width: 100% !important; }
 }
